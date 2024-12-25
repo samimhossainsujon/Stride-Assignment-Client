@@ -1,3 +1,13 @@
+Buyer 
+email: buyer@gmail.com
+password:buyer@@@018@@@
+
+
+Seller 
+email:seller@gmail.com
+password:seller@@@018@@@
+
+
 admin
-email:samim@gmail.com
-password:Samim@@@018@@@
+email:admin@gmail.com
+password:Admin@@@018@@@
