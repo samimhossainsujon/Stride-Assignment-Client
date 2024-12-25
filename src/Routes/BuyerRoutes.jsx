@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Navigate } from "react-router-dom";
 import Loading from "../components/Loading/Loading";
 import useGetSingleUser from "../Hooks/useGetSingleUser";

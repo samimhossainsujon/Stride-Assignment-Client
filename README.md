@@ -1,11 +1,11 @@
 Buyer 
 email: buyer@gmail.com
-password:buyer@@@018@@@
+password:Buyer@@@018@@@
 
 
 Seller 
 email:seller@gmail.com
-password:seller@@@018@@@
+password:Seller@@@018@@@
 
 
 admin

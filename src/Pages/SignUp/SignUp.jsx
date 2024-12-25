@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleSignIn from "../../components/googleSignIn/GoogleSignIn";
 
 const SignUp = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const { createUser } = useAuth();
   const [createUserIntoDb] = useCreateUserMutation();
   const {
@@ -19,67 +19,47 @@ const SignUp = () => {
     watch,
   } = useForm();
 
-  const options = [
-    {
-      option: "Buyer",
-      value: "buyer",
-    },
-    {
-      option: "Seller",
-      value: "seller",
-    },
+  const roles = [
+    { label: "Buyer", value: "buyer" },
+    { label: "Seller", value: "seller" },
   ];
 
   const onSubmit = async (data) => {
     try {
       Swal.fire({
-        title: "wait...",
+        title: "Please wait...",
         allowEscapeKey: false,
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+        didOpen: () => Swal.showLoading(),
       });
+
       const image = await GetHostUrl(data.image[0]);
       data.image = image;
-      const resFromFirebase = await createUser(data.email, data.password);
-      if (resFromFirebase) {
-        const res = await createUserIntoDb(data).unwrap();
-        if (res.acknowledged === true) {
+
+      const firebaseResponse = await createUser(data.email, data.password);
+      if (firebaseResponse) {
+        const response = await createUserIntoDb(data).unwrap();
+        if (response.acknowledged) {
           Swal.fire({
-            position: "center",
             icon: "success",
             title: "Registration Successful",
-            showConfirmButton: false,
             timer: 1500,
+            showConfirmButton: false,
           });
-          Navigate("/");
+          navigate("/");
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "MongoDB Error",
-            text: res.message || "Failed to save user in the database.",
-          });
+          throw new Error("Failed to save user in the database.");
         }
       }
     } catch (error) {
-      console.log({ error });
-      console.error("Error uploading image:", error);
-      // Handle Firebase errors
-      if (error.code && error.message) {
-        Swal.fire({
-          icon: "error",
-          title: "Firebase Error",
-          text: error.message,
-        });
-      } else {
-        // Handle general or MongoDB-specific errors
-        Swal.fire({
-          icon: "error",
-          title: "Unexpected Error",
-          text: error.message || "An error occurred during registration.",
-        });
-      }
+      const errorMessage =
+        error.message || "An error occurred during registration.";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+      console.error(error);
     }
   };
 
@@ -94,8 +74,7 @@ const SignUp = () => {
           </h1>
           <p className="py-6 text-primary">
             Discover the latest gadgets, unbeatable deals, and exclusive offers
-            at MobileMart. Sign up now and stay connected to the world of smart
-            technology at your fingertips!
+            at MobileMart. Sign up now!
           </p>
         </div>
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
@@ -111,6 +90,7 @@ const SignUp = () => {
             {errors.name && (
               <p className="text-red-500">{errors.name.message}</p>
             )}
+
             <Input
               label="Email"
               placeholder="Enter Your Email"
@@ -122,6 +102,7 @@ const SignUp = () => {
             {errors.email && (
               <p className="text-red-500">{errors.email.message}</p>
             )}
+
             <Input
               label="Password"
               placeholder="Enter Your Password"
@@ -132,7 +113,7 @@ const SignUp = () => {
                 required: "Password is required",
                 minLength: {
                   value: 8,
-                  message: "Password must be at least 8 characters long",
+                  message: "Password must be at least 8 characters",
                 },
                 pattern: {
                   value:
@@ -145,6 +126,7 @@ const SignUp = () => {
             {errors.password && (
               <p className="text-red-500">{errors.password.message}</p>
             )}
+
             <Input
               label="Confirm Password"
               placeholder="Confirm Your Password"
@@ -160,12 +142,14 @@ const SignUp = () => {
             {errors.confirmPassword && (
               <p className="text-red-500">{errors.confirmPassword.message}</p>
             )}
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Image</span>
               </label>
               <InputImage register={register} registerName="image" />
             </div>
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Role</span>
@@ -174,12 +158,12 @@ const SignUp = () => {
                 className="select select-info w-full max-w-xs"
                 {...register("role", { required: "Please select a role" })}
               >
-                <option value="" disabled selected>
+                <option value="" disabled>
                   Select Role
                 </option>
-                {options.map((option, i) => (
-                  <option value={option.value} key={i}>
-                    {option.option}
+                {roles.map((role, index) => (
+                  <option value={role.value} key={index}>
+                    {role.label}
                   </option>
                 ))}
               </select>
@@ -187,21 +171,20 @@ const SignUp = () => {
                 <p className="text-red-500">{errors.role.message}</p>
               )}
             </div>
+
             <div className="form-control mt-6">
               <button type="submit" className="btn btn-info hover:btn-neutral">
                 Sign Up
               </button>
             </div>
           </form>
-          {/* google sign in */}
 
           <GoogleSignIn />
 
-          {/* ------------ */}
           <div className="my-4 text-center text-info">
             <p>
               Already Have an account?{" "}
-              <Link to={"/login"}>
+              <Link to="/login">
                 <span className="text-red-600 underline">Log In</span>
               </Link>
             </p>
