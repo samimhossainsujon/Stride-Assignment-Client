@@ -2,4 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.btn-main {
+    @apply px-4 py-2 text-white font-semibold bg-gradient-to-r from-secondary to-accent hover:px-5 hover:transition-all duration-150 rounded
+}
 
+.bg-gradient {
+    @apply bg-gradient-to-r from-secondary to-accent
+}
